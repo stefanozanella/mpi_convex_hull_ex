@@ -1,7 +1,7 @@
 BIN = bin/hello
 PROCS = 4
 
-CFLAGS = -Wall -W -pedantic -std=c99
+CFLAGS = -Wall -W -pedantic -std=c99 -Wno-unused-parameter
 MPICC = mpicc
 RUN = mpirun
 RUN_OPTS = -np $(PROCS)
