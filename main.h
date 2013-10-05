@@ -16,3 +16,5 @@ int hello_world(int argc, char* argv[]);
 
 // Simple one-way msg exchange between 2 procs
 int ping(int argc, char* argv[]);
+void ping_sender(int rank);
+void ping_receiver(int rank);
