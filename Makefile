@@ -13,7 +13,7 @@ clean:
 	rm -f *.o
 	rm -f bin/*
 
-run: all
+run:
 	$(RUN) $(RUN_OPTS) $(BIN)
 
 .PHONY: all clean run
