@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#@ job_name     = main
+#@ initialdir   = /home/zanellas
+#@ input        = /dev/null
+#@ output       = $(job_name).out
+#@ error        = $(job_name).err
+#@ class        = short
+#@ job_type     = parallel
+#@ blocking     = unlimited
+#@ total_tasks  = 4
+#@ queue
+
+bin/main
