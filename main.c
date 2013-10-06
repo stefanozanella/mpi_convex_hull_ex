@@ -1,7 +1,7 @@
 #include "main.h"
 
 int main(int argc, char* argv[]) {
-  return exec_mpi_app(ping, argc, argv);
+  return exec_mpi_app(bcast_ping, argc, argv);
 }
 
 int exec_mpi_app(int (*app)(int, char**), int argc, char* argv[]) {
@@ -60,3 +60,36 @@ void ping_receiver(int rank) {
   MPI_Recv(&buf, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
   printf("#%d has received %d from %d\n", rank, buf, 0);
 }
+
+/*
+ * Broadcast Ping
+ */
+int bcast_ping(int argc, char* argv[]) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  switch (rank) {
+  case 0:
+    bcast_ping_sender(rank);
+    break;
+
+  default:
+    bcast_ping_receiver(rank);
+    break;
+  }
+
+  return 0;
+}
+
+void bcast_ping_sender(int rank) {
+  int buf = 123456;
+  MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  printf("#%d has sent %d to %d\n", rank, buf, 1);
+}
+
+void bcast_ping_receiver(int rank) {
+  int buf;
+  MPI_Bcast(&buf, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  printf("#%d has received %d from %d\n", rank, buf, 0);
+}
+
