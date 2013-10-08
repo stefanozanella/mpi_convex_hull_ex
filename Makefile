@@ -15,5 +15,3 @@ clean:
 
 run:
 	$(RUN) $(RUN_OPTS) $(BIN)
-
-.PHONY: all clean run
