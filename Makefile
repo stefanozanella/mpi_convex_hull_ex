@@ -6,6 +6,9 @@ MPICC = mpicc
 RUN = mpirun
 RUN_OPTS = -np $(PROCS)
 
+gen_test_data: gen_test_data.c
+	$(CC) $(CFLAGS) -o bin/gen_test_data $^
+
 all: *.c *.h
 	$(MPICC) $(CFLAGS) -o $(BIN) $^
 
