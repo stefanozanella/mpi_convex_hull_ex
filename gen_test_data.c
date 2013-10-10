@@ -99,6 +99,28 @@ int point_compare(const void *p_ptr1, const void *p_ptr2) {
   return ret;
 }
 
+coord_t turn_direction(point_t p1, point_t p2, point_t p3) {
+  return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+}
+
+void convex_hull(point_t* cloud, int cloud_size, point_t* out_hull, ulong* out_size) {
+  point_t* hull = out_hull;
+  int j = 0;
+
+  for (int k = 0; k < cloud_size; k++) {
+    while (j >= 2 && turn_direction(hull[j-2], hull[j-1], cloud[k]) <= 0) --j;
+    hull[j++] = cloud[k];
+  }
+
+  for (int k = cloud_size-2, t = j+1; k >= 0; --k) {
+    while (j >= t && turn_direction(hull[j-2], hull[j-1], cloud[k]) <= 0) --j;
+    hull[j++] = cloud[k];
+  }
+
+  out_hull = hull;
+  *out_size = j;
+}
+
 void store_point_cloud(point_t* pc, int pc_size, FILE* out) {
   for (int k = 0; k < pc_size; k++) {
     fprintf(out, "%ld\t%ld\n", pc[k].x, pc[k].y);
@@ -126,20 +148,37 @@ int main(int argc, char** argv) {
 
   printf("Generated %lu points in %.6fs.\n", point_cloud_size, end_time - start_time);
 
-  printf("Calculating the convex hull...\n");
-  start_time = now();
-  qsort(point_cloud, point_cloud_size, sizeof(point_t), &point_compare);
-  end_time = now();
-  printf("Found the convex hull in %.6fs.\n", end_time - start_time);
-
   printf("Storing points into %s...", out_filename);
   FILE *out_fp;
   if ((out_fp = fopen(out_filename, "w")) == NULL) {
     printf("\nError: cannot open file %s. Aborting.\n", out_filename);
     exit(1);
   }
-
   store_point_cloud(point_cloud, point_cloud_size, out_fp);
+
+  printf("done.\n");
+  fclose(out_fp);
+
+  printf("Calculating the convex hull...\n");
+  start_time = now();
+  qsort(point_cloud, point_cloud_size, sizeof(point_t), &point_compare);
+  point_t* hull = init_point_cloud(point_cloud_size);
+  ulong hull_size = 0;
+  convex_hull(point_cloud, point_cloud_size, hull, &hull_size);
+  end_time = now();
+  printf("Found the convex hull in %.6fs.\n", end_time - start_time);
+
+  char hull_filename[255];
+  sprintf(hull_filename, "data/hull_%lu.dat", point_cloud_size);
+
+  printf("Storing convex hull into %s...", hull_filename);
+  FILE *hull_fp;
+  if ((hull_fp = fopen(hull_filename, "w")) == NULL) {
+    printf("\nError: cannot open file %s. Aborting.\n", hull_filename);
+    exit(1);
+  }
+  qsort(hull, hull_size, sizeof(point_t), &point_compare);
+  store_point_cloud(hull, hull_size, hull_fp);
 
   printf("done.\n");
   fclose(out_fp);
