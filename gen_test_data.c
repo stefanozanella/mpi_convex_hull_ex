@@ -6,14 +6,13 @@
 #include <sys/resource.h>
 #include <sys/time.h>
 
+typedef unsigned long ulong;
+typedef signed long coord_t;  // A point's coordinate
+
 typedef struct point {
-  float x;
-  float y;
+  coord_t x;
+  coord_t y;
 } point_t; // A point of our system
-
-typedef float coord_t;  // A point's coordinate
-
-typedef unsigned long ulong_t;
 
 void print_usage(char* prog_name) {
   printf("Usage: %s <size>\n", prog_name);
@@ -21,23 +20,9 @@ void print_usage(char* prog_name) {
   printf("  size: number of test points to generate\n");
 }
 
-void init_cloud_generation() {
-  srand(time(NULL));
-}
-
-coord_t rand_coord(float limit) {
-  ulong_t safe_limit = limit == 0 ? 1l : limit;
-
-  return ((coord_t) rand() / (coord_t) RAND_MAX - 0.5) * safe_limit;
-}
-
-point_t random_point(float limit) {
-  return (point_t) { rand_coord(limit), rand_coord(limit) };
-}
-
-ulong_t parse_long(char *str) {
+ulong parse_long(char *str) {
   char *end;
-  ulong_t ret = strtoul(str, &end, 10);
+  ulong ret = strtoul(str, &end, 10);
 
   if (strlen(end) > 0) {
     printf("Error: size must be an integer, but %s was provided.\n", str);
@@ -56,8 +41,22 @@ double now()
   return t.tv_sec + t.tv_usec*1e-6;
 }
 
-point_t* init_point_cloud(ulong_t size) {
+void init_cloud_generation() {
+  srand(time(NULL));
+}
+
+point_t* init_point_cloud(ulong size) {
   return (point_t*) malloc(size * sizeof(point_t));
+}
+
+coord_t rand_coord(coord_t limit) {
+  coord_t safe_limit = limit == 0 ? 1l : limit;
+
+  return ((float) rand() / (float) RAND_MAX - 0.5) * safe_limit * 1e2;
+}
+
+point_t random_point(coord_t limit) {
+  return (point_t) { rand_coord(limit), rand_coord(limit) };
 }
 
 /*
@@ -71,26 +70,23 @@ point_t* init_point_cloud(ulong_t size) {
  * the choice of the exact expression is rather customary and has been done on
  * an inspection basis (looking at the final picture of the point cloud).
  */
-void init_round_limits(float *output, ulong_t rounds) {
-  for (ulong_t k = 0; k < rounds; k++) {
+void init_round_limits(float *output, ulong rounds) {
+  for (ulong k = 0; k < rounds; k++) {
     output[k] = 1.0 - log((1.0 + k) / rounds);
   }
 }
 
-void generate_point_cloud(ulong_t size, point_t* output) {
-  ulong_t rounds = size / 1e2;
+void generate_point_cloud(ulong size, point_t* output) {
+  ulong rounds = size / 1e2;
   float *round_limits = (float*) malloc(rounds * sizeof(float));
   init_round_limits(round_limits, rounds);
 
-  ulong_t round_size = size / rounds;
+  ulong round_size = size / rounds;
 
-  for (ulong_t k = 0; k < size; k++) {
+  for (ulong k = 0; k < size; k++) {
     output[k] = random_point(round_limits[k/round_size]);
+    //output[k] = random_point(size);
   }
-}
-
-int epsilon_equal(coord_t c1, coord_t c2) {
-  return fabs((c1 - c2) / c2) <= 0.0001;
 }
 
 int point_compare(const void *p_ptr1, const void *p_ptr2) {
@@ -98,21 +94,14 @@ int point_compare(const void *p_ptr1, const void *p_ptr2) {
   point_t p2 = *((point_t*)p_ptr2);
 
   coord_t ret = p1.x - p2.x;
-  if (epsilon_equal(ret, 0.0)) { ret = p1.y - p2.y; };
-
-  if (epsilon_equal(ret, 0.0)) {
-    ret = 0;
-  }
-  else {
-    ret = (0.0 < ret) - (ret < 0.0);
-  }
+  if (ret == 0l) { ret = p1.y - p2.y; };
 
   return ret;
 }
 
 void store_point_cloud(point_t* pc, int pc_size, FILE* out) {
   for (int k = 0; k < pc_size; k++) {
-    fprintf(out, "%.9f\t%.9f\n", pc[k].x, pc[k].y);
+    fprintf(out, "%ld\t%ld\n", pc[k].x, pc[k].y);
   }
 }
 
@@ -122,7 +111,7 @@ int main(int argc, char** argv) {
     exit(1);
   }
 
-  ulong_t point_cloud_size = parse_long(argv[1]);
+  ulong point_cloud_size = parse_long(argv[1]);
 
   char out_filename[255];
   sprintf(out_filename, "data/cloud_%lu.dat", point_cloud_size);
