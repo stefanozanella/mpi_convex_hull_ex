@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,27 +60,32 @@ point_t* init_point_cloud(ulong_t size) {
   return (point_t*) malloc(size * sizeof(point_t));
 }
 
-void generate_point_cloud(ulong_t size, point_t* output) {
-  #define STEP_NO 10
+/*
+ * If we allow each point to be picked in the same range, as the number of
+ * points increase, the final shape will strongly resemble a square. Instead,
+ * if we partition the number of points so that each subset of points is picked
+ * from a range that is larger/smaller than the previous ones, we will obtain a
+ * more randomic shape. In particular, we'll have less chances to have
+ * collinear points on the convex hull, and its shape will be more fuzzy.
+ * To improve the fuzziness around the edges, we'll use a logarithmic function;
+ * the choice of the exact expression is rather customary and has been done on
+ * an inspection basis (looking at the final picture of the point cloud).
+ */
+void init_round_limits(float *output, ulong_t rounds) {
+  for (ulong_t k = 0; k < rounds; k++) {
+    output[k] = 1.0 - log((1.0 + k) / rounds);
+  }
+}
 
-  /* This LUT is used to give the final cloud a more randomic, less squared
-   * shape.
-   */
-  const float round_limits[STEP_NO] = {
-    1.0,
-    2.0,
-    3.0,
-    3.3,
-    4.2,
-    4.6,
-    4.7,
-    4.8,
-    4.9,
-    5.0 };
-  ulong_t step_size = size / STEP_NO;
+void generate_point_cloud(ulong_t size, point_t* output) {
+  ulong_t rounds = size / 1e2;
+  float *round_limits = (float*) malloc(rounds * sizeof(float));
+  init_round_limits(round_limits, rounds);
+
+  ulong_t round_size = size / rounds;
 
   for (ulong_t k = 0; k < size; k++) {
-    output[k] = random_point(round_limits[k/step_size]);
+    output[k] = random_point(round_limits[k/round_size]);
   }
 }
 
