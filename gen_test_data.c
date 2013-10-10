@@ -89,6 +89,27 @@ void generate_point_cloud(ulong_t size, point_t* output) {
   }
 }
 
+int epsilon_equal(coord_t c1, coord_t c2) {
+  return fabs((c1 - c2) / c2) <= 0.0001;
+}
+
+int point_compare(const void *p_ptr1, const void *p_ptr2) {
+  point_t p1 = *((point_t*)p_ptr1);
+  point_t p2 = *((point_t*)p_ptr2);
+
+  coord_t ret = p1.x - p2.x;
+  if (epsilon_equal(ret, 0.0)) { ret = p1.y - p2.y; };
+
+  if (epsilon_equal(ret, 0.0)) {
+    ret = 0;
+  }
+  else {
+    ret = (0.0 < ret) - (ret < 0.0);
+  }
+
+  return ret;
+}
+
 void store_point_cloud(point_t* pc, int pc_size, FILE* out) {
   for (int k = 0; k < pc_size; k++) {
     fprintf(out, "%.9f\t%.9f\n", pc[k].x, pc[k].y);
@@ -115,6 +136,12 @@ int main(int argc, char** argv) {
   double end_time = now();
 
   printf("Generated %lu points in %.6fs.\n", point_cloud_size, end_time - start_time);
+
+  printf("Calculating the convex hull...\n");
+  start_time = now();
+  qsort(point_cloud, point_cloud_size, sizeof(point_t), &point_compare);
+  end_time = now();
+  printf("Found the convex hull in %.6fs.\n", end_time - start_time);
 
   printf("Storing points into %s...", out_filename);
   FILE *out_fp;
