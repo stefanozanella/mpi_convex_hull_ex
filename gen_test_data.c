@@ -103,7 +103,7 @@ coord_t turn_direction(point_t p1, point_t p2, point_t p3) {
   return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
 }
 
-void convex_hull(point_t* cloud, int cloud_size, point_t* out_hull, ulong* out_size) {
+void convex_hull_monotone_chain(point_t* cloud, int cloud_size, point_t* out_hull, ulong* out_size) {
   point_t* hull = out_hull;
   int j = 0;
 
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
   qsort(point_cloud, point_cloud_size, sizeof(point_t), &point_compare);
   point_t* hull = init_point_cloud(point_cloud_size);
   ulong hull_size = 0;
-  convex_hull(point_cloud, point_cloud_size, hull, &hull_size);
+  convex_hull_monotone_chain(point_cloud, point_cloud_size, hull, &hull_size);
   end_time = now();
   printf("Found the convex hull in %.6fs.\n", end_time - start_time);
 
