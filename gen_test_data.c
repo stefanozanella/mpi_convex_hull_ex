@@ -14,6 +14,9 @@ typedef struct point {
   coord_t y;
 } point_t; // A point of our system
 
+/*
+ * Help screen.
+ */
 void print_usage(char* prog_name) {
   printf("Usage: %s <size>\n", prog_name);
   printf("Parameters:\n");
