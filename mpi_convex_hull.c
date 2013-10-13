@@ -1,4 +1,4 @@
-#include "main.h"
+#include "mpi_convex_hull.h"
 
 int main(int argc, char* argv[]) {
   return exec_mpi_app(argc, argv);

@@ -9,7 +9,7 @@ RUN_OPTS = -np $(PROCS)
 gen_test_data: gen_test_data.c
 	$(CC) $(CFLAGS) -o $(BINDIR)/gen_test_data $^
 
-mpi_convex_hull: main.c main.h
+mpi_convex_hull: mpi_convex_hull.c mpi_convex_hull.h
 	$(MPICC) $(CFLAGS) -o $(BINDIR)/mpi_convex_hull $^
 
 clean:
