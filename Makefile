@@ -26,4 +26,4 @@ clean:
 	rm -f bin/*
 
 run:
-	$(RUN) $(RUN_OPTS) $(MPI_CONVEX_HULL_BIN)
+	$(RUN) $(RUN_OPTS) $(MPI_CONVEX_HULL_BIN) $(in)

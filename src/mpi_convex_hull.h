@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <mpi.h>
 
 /*
@@ -11,3 +12,5 @@ int exec_mpi_app(int argc, char* argv[]);
  * MPI Convex Hull
  */
 int mpi_convex_hull(int argc, char* argv[]);
+int ch_master(int argc, char* argv[]);
+void print_usage(char *app_name);
