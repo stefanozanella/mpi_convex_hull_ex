@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <sys/resource.h>
 #include <sys/time.h>
+#include <time.h>
 
 typedef unsigned long ulong;
 typedef signed long coord_t;  // A point's coordinate
@@ -38,8 +38,7 @@ ulong parse_long(char *str) {
 double now()
 {
   struct timeval t;
-  struct timezone tzp;
-  gettimeofday(&t, &tzp);
+  gettimeofday(&t, NULL);
 
   return t.tv_sec + t.tv_usec*1e-6;
 }
