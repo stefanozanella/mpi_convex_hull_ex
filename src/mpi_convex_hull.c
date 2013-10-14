@@ -52,6 +52,14 @@ int ch_master(int argc, char* argv[]) {
     return 1;
   }
 
+  int cloud_size = 0;
+  if (fscanf(point_cloud_fp, PC_SIZE_FMT, &cloud_size) < 1) {
+    printf("Cannot read point cloud size: please start the file with the following line:\n");
+    printf("# size=<cloud size>\n");
+  }
+
+  printf("Reading point cloud of size %d\n", cloud_size);
+
   return 0;
 }
 

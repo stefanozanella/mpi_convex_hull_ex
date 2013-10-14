@@ -6,13 +6,8 @@
 #include <sys/time.h>
 #include <time.h>
 
-typedef unsigned long ulong;
-typedef signed long coord_t;  // A point's coordinate
-
-typedef struct point {
-  coord_t x;
-  coord_t y;
-} point_t; // A point on our system
+#include "point_cloud_geom.h"
+#include "point_cloud_io.h"
 
 /*
  * Help screen.
@@ -21,18 +16,6 @@ void print_usage(char* prog_name) {
   printf("Usage: %s <size>\n", prog_name);
   printf("Parameters:\n");
   printf("  size: number of test points to generate\n");
-}
-
-ulong parse_long(char *str) {
-  char *end;
-  ulong ret = strtoul(str, &end, 10);
-
-  if (strlen(end) > 0) {
-    printf("Error: size must be an integer, but %s was provided.\n", str);
-    exit(1);
-  }
-
-  return ret;
 }
 
 double now()
@@ -121,12 +104,6 @@ void convex_hull_monotone_chain(point_t* cloud, int cloud_size, point_t* out_hul
 
   out_hull = hull;
   *out_size = j;
-}
-
-void store_point_cloud(point_t* pc, int pc_size, FILE* out) {
-  for (int k = 0; k < pc_size; k++) {
-    fprintf(out, "%ld\t%ld\n", pc[k].x, pc[k].y);
-  }
 }
 
 int main(int argc, char** argv) {

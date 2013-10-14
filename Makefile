@@ -10,8 +10,9 @@ RUN_OPTS = -np $(PROCS)
 GEN_TEST_DATA_BIN = $(BINDIR)/gen_test_data
 MPI_CONVEX_HULL_BIN = $(BINDIR)/mpi_convex_hull
 
-GEN_TEST_DATA_SOURCE = src/gen_test_data.c
-MPI_CONVEX_HULL_SOURCE = src/mpi_convex_hull.c src/mpi_convex_hull.h
+COMMON_SOURCE = src/point_cloud_io.c src/point_cloud_geom.c
+GEN_TEST_DATA_SOURCE = src/gen_test_data.c $(COMMON_SOURCE)
+MPI_CONVEX_HULL_SOURCE = src/mpi_convex_hull.c $(COMMON_SOURCE)
 
 gen_test_data: $(GEN_TEST_DATA_SOURCE)
 	$(CC) $(CFLAGS) -o $(GEN_TEST_DATA_BIN) $^ $(LIBS)

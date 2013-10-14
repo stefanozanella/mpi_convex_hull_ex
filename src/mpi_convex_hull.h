@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <mpi.h>
+
+#include "point_cloud_io.h"
 
 /*
  * Wraps MPI initialization/finalization code, so that independent apps don't
