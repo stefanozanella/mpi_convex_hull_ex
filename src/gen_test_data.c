@@ -30,10 +30,6 @@ void init_cloud_generation() {
   srand(time(NULL));
 }
 
-point_t* init_point_cloud(ulong size) {
-  return (point_t*) malloc(size * sizeof(point_t));
-}
-
 coord_t rand_coord(coord_t limit) {
   coord_t safe_limit = limit == 0 ? 1l : limit;
 

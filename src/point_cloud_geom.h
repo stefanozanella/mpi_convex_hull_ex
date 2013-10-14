@@ -14,5 +14,6 @@ typedef struct point {
 } point_t; // A point on our system
 
 ulong parse_long(char *str);
+point_t* init_point_cloud(ulong size);
 
 #endif

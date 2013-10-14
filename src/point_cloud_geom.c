@@ -11,3 +11,7 @@ ulong parse_long(char *str) {
 
   return ret;
 }
+
+point_t* init_point_cloud(ulong size) {
+  return (point_t*) malloc(size * sizeof(point_t));
+}

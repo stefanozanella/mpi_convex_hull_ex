@@ -8,10 +8,27 @@ int exec_mpi_app(int argc, char* argv[]) {
   int retval;
 
   MPI_Init(&argc, &argv);
+  mpi_initialize_runtime();
   retval = mpi_convex_hull(argc, argv);
   MPI_Finalize();
 
   return retval;
+}
+
+void mpi_init_point_type() {
+  MPI_Datatype mpi_point, types[1];
+  int blockcounts[1];
+  MPI_Aint offsets[1];
+
+  blockcounts[0] = 2;
+  offsets[0] = 0;
+  types[0] = MPI_LONG;
+  MPI_Type_struct(1, blockcounts, offsets, types, &mpi_point_t);
+  MPI_Type_commit(&mpi_point_t);
+}
+
+void mpi_initialize_runtime() {
+  mpi_init_point_type();
 }
 
 /*
@@ -29,6 +46,7 @@ int mpi_convex_hull(int argc, char* argv[]) {
       retval = ch_master(argc, argv);
       break;
     default:
+      retval = ch_slave(argc, argv, rank);
       break;
   }
 
@@ -58,9 +76,29 @@ int ch_master(int argc, char* argv[]) {
     printf("# size=<cloud size>\n");
   }
 
-  printf("Reading point cloud of size %d\n", cloud_size);
+  printf("Reading point cloud of size %d.\n", cloud_size);
+  point_t *point_cloud = init_point_cloud(cloud_size);
+  load_point_cloud(point_cloud, cloud_size, point_cloud_fp);
+  printf("[done]\n");
+
+  bcast_point_cloud_size(&cloud_size);
 
   return 0;
+}
+
+int ch_slave(int argc, char *argv[], int rank) {
+  int cloud_size;
+  bcast_point_cloud_size(&cloud_size);
+  printf("[%d] Advertised point cloud size: %d\n", rank, cloud_size);
+
+  return 0;
+}
+
+void bcast_point_cloud_size(int *size) {
+  MPI_Bcast(size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+}
+
+void chan_step_1(point_t* pc, int pc_size) {
 }
 
 /*

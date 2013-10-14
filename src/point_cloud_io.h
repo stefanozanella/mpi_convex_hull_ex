@@ -10,5 +10,6 @@
 #define PC_POINT_FMT "%ld\t%ld\n"
 
 void store_point_cloud(point_t* pc, int pc_size, FILE* out);
+void load_point_cloud(point_t* pc, int pc_size, FILE* in);
 
 #endif
