@@ -6,12 +6,12 @@
 #include <stdlib.h>
 
 typedef unsigned long ulong;
-typedef signed long coord_t;  // A point's coordinate
+typedef signed long coord_t;
 
 typedef struct point {
   coord_t x;
   coord_t y;
-} point_t; // A point on our system
+} point_t;
 
 ulong parse_long(char *str);
 point_t* init_point_cloud(ulong size);
