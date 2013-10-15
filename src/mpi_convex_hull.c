@@ -123,6 +123,11 @@ void chan_step_1(point_t* pc, int pc_size, int rank, int cpu_count) {
   point_t *pc_chunk = init_point_cloud(chunk_sizes[rank]);
 
   MPI_Scatterv(pc, chunk_sizes, offsets, mpi_point_t, pc_chunk, chunk_sizes[rank], mpi_point_t, 0, MPI_COMM_WORLD);
+
+  point_t* chunk_hull = init_point_cloud(chunk_sizes[rank]);
+  ulong chunk_hull_size = 0;
+  qsort(pc_chunk, chunk_sizes[rank], sizeof(point_t), &point_compare);
+  convex_hull_monotone_chain(pc_chunk, chunk_sizes[rank], chunk_hull, &chunk_hull_size);
 }
 
 /*

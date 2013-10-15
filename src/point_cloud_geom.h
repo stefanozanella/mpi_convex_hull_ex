@@ -15,5 +15,6 @@ typedef struct point {
 
 ulong parse_long(char *str);
 point_t* init_point_cloud(ulong size);
+int point_compare(const void *p_ptr1, const void *p_ptr2);
 
 #endif

@@ -8,6 +8,7 @@
 
 #include "point_cloud_geom.h"
 #include "point_cloud_io.h"
+#include "convex_hull.h"
 
 /*
  * Help screen.
@@ -68,38 +69,6 @@ void generate_point_cloud(ulong size, point_t* output) {
     output[k] = random_point(round_limits[k/round_size]);
     //output[k] = random_point(size);
   }
-}
-
-int point_compare(const void *p_ptr1, const void *p_ptr2) {
-  point_t p1 = *((point_t*)p_ptr1);
-  point_t p2 = *((point_t*)p_ptr2);
-
-  coord_t ret = p1.x - p2.x;
-  if (ret == 0l) { ret = p1.y - p2.y; };
-
-  return ret;
-}
-
-coord_t turn_direction(point_t p1, point_t p2, point_t p3) {
-  return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
-}
-
-void convex_hull_monotone_chain(point_t* cloud, int cloud_size, point_t* out_hull, ulong* out_size) {
-  point_t* hull = out_hull;
-  int j = 0;
-
-  for (int k = 0; k < cloud_size; k++) {
-    while (j >= 2 && turn_direction(hull[j-2], hull[j-1], cloud[k]) <= 0) --j;
-    hull[j++] = cloud[k];
-  }
-
-  for (int k = cloud_size-2, t = j+1; k >= 0; --k) {
-    while (j >= t && turn_direction(hull[j-2], hull[j-1], cloud[k]) <= 0) --j;
-    hull[j++] = cloud[k];
-  }
-
-  out_hull = hull;
-  *out_size = j;
 }
 
 int main(int argc, char** argv) {

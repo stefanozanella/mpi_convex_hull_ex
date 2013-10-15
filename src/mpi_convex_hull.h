@@ -5,6 +5,7 @@
 #include <mpi.h>
 
 #include "point_cloud_io.h"
+#include "convex_hull.h"
 
 #define MAX_CPUS 256
 
