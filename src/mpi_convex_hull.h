@@ -1,9 +1,12 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
 
 #include "point_cloud_io.h"
+
+#define MAX_CPUS 256
 
 /*
  * Represents a point in MPI communications
@@ -26,8 +29,9 @@ void mpi_init_point_type();
  * MPI Convex Hull
  */
 int mpi_convex_hull(int argc, char* argv[]);
-int ch_master(int argc, char* argv[]);
-int ch_slave(int argc, char* argv[], int rank);
+int ch_master(int argc, char* argv[], int rank, int cpu_count);
+int ch_slave(int argc, char* argv[], int rank, int cpu_count);
 void bcast_point_cloud_size(int* size);
-void chan_step_1(point_t* pc, int pc_size);
+void setup_scatter_params(int array_size, int dest_count, int *sizes, int *offsets);
+void chan_step_1(point_t* pc, int pc_size, int rank, int cpu_count);
 void print_usage(char *app_name);
