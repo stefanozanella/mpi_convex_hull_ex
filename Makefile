@@ -3,9 +3,11 @@ BINDIR = bin
 
 MPICC = $(@which mpcc 2>&1 > /dev/null)
 CFLAGS = -std=c99
-ifndef $(MPICC)
+ifeq ($(shell which mpcc 2> /dev/null),)
 	MPICC = mpicc
 	CFLAGS += -Wall -W -pedantic -Wno-unused-parameter
+else
+	MPICC = mpcc
 endif
 RUN = mpirun
 
