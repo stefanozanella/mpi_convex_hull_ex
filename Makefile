@@ -1,10 +1,15 @@
 PROCS = 4
-
 BINDIR = bin
-CFLAGS = -Wall -W -pedantic -std=c99 -Wno-unused-parameter
-LIBS = -lm
-MPICC = mpicc
+
+MPICC = $(@which mpcc 2>&1 > /dev/null)
+CFLAGS = -std=c99
+ifndef $(MPICC)
+	MPICC = mpicc
+	CFLAGS += -Wall -W -pedantic -Wno-unused-parameter
+endif
 RUN = mpirun
+
+LIBS = -lm
 RUN_OPTS = -np $(PROCS)
 
 GEN_TEST_DATA_BIN = $(BINDIR)/gen_test_data
@@ -14,13 +19,16 @@ COMMON_SOURCE = src/point_cloud_io.c src/point_cloud_geom.c src/convex_hull.c
 GEN_TEST_DATA_SOURCE = src/gen_test_data.c $(COMMON_SOURCE)
 MPI_CONVEX_HULL_SOURCE = src/mpi_convex_hull.c $(COMMON_SOURCE)
 
+prep:
+	mkdir -p $(BINDIR)
+
 gen_test_data: $(GEN_TEST_DATA_SOURCE)
 	$(CC) $(CFLAGS) -o $(GEN_TEST_DATA_BIN) $^ $(LIBS)
 
 mpi_convex_hull: $(MPI_CONVEX_HULL_SOURCE)
 	$(MPICC) $(CFLAGS) -o $(MPI_CONVEX_HULL_BIN) $^ $(LIBS)
 
-all: mpi_convex_hull gen_test_data
+all: prep mpi_convex_hull gen_test_data
 
 clean:
 	rm -f *.o
@@ -28,3 +36,5 @@ clean:
 
 run:
 	$(RUN) $(RUN_OPTS) $(MPI_CONVEX_HULL_BIN) $(in)
+
+.PHONY : prep clean
