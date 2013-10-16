@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#@ job_name     = main
+#@ job_name     = mpi_convex_hull
 #@ initialdir   = /home/zanellas
 #@ input        = /dev/null
 #@ output       = $(job_name).out
@@ -11,4 +11,4 @@
 #@ total_tasks  = 4
 #@ queue
 
-bin/main
+bin/mpi_convex_hull
