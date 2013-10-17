@@ -67,7 +67,7 @@ void generate_point_cloud(ulong size, point_t* output) {
 
   for (ulong k = 0; k < size; k++) {
     output[k] = random_point(round_limits[k/round_size]);
-    //output[k] = random_point(size);
+    /* output[k] = random_point(size); */
   }
 }
 
