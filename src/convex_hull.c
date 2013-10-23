@@ -1,21 +1,20 @@
 #include "convex_hull.h"
 
-void convex_hull_monotone_chain(point_t* cloud, int cloud_size, point_t* out_hull, ulong* out_size) {
-  point_t* hull = out_hull;
+point_cloud_t convex_hull_monotone_chain(point_cloud_t cloud, point_cloud_t hull) {
   int j = 0;
 
-  for (int k = 0; k < cloud_size; k++) {
-    while (j >= 2 && turn_direction(hull[j-2], hull[j-1], cloud[k]) <= 0) --j;
-    hull[j++] = cloud[k];
+  for (int k = 0; k < cloud.size; k++) {
+    while (j >= 2 && turn_direction(hull.pc[j-2], hull.pc[j-1], cloud.pc[k]) <= 0) --j;
+    hull.pc[j++] = cloud.pc[k];
   }
 
-  for (int k = cloud_size-2, t = j+1; k >= 0; --k) {
-    while (j >= t && turn_direction(hull[j-2], hull[j-1], cloud[k]) <= 0) --j;
-    hull[j++] = cloud[k];
+  for (int k = cloud.size-2, t = j+1; k >= 0; --k) {
+    while (j >= t && turn_direction(hull.pc[j-2], hull.pc[j-1], cloud.pc[k]) <= 0) --j;
+    hull.pc[j++] = cloud.pc[k];
   }
 
-  out_hull = hull;
-  *out_size = j;
+  hull.size = j;
+  return hull;
 }
 
 coord_t turn_direction(point_t p1, point_t p2, point_t p3) {

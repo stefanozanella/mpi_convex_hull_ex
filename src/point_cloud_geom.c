@@ -12,8 +12,12 @@ ulong parse_long(char *str) {
   return ret;
 }
 
-point_t* init_point_cloud(ulong size) {
-  return (point_t*) malloc(size * sizeof(point_t));
+point_cloud_t init_point_cloud(ulong size) {
+  point_cloud_t ret;
+  ret.pc = (point_t*) malloc(size * sizeof(point_t));
+  ret.size = size;
+
+  return ret;
 }
 
 int point_compare(const void *p_ptr1, const void *p_ptr2) {
