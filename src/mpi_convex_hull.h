@@ -34,5 +34,5 @@ int ch_master(int argc, char* argv[], int rank, int cpu_count);
 int ch_slave(int argc, char* argv[], int rank, int cpu_count);
 void bcast_point_cloud_size(int* size);
 void setup_scatter_params(int array_size, int dest_count, int *sizes, int *offsets);
-void chan_step_1(point_t* pc, int pc_size, int rank, int cpu_count);
+void chan_step_1(point_cloud_t pc, int rank, int cpu_count);
 void print_usage(char *app_name);

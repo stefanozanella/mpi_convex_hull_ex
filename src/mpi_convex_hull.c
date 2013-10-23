@@ -77,13 +77,12 @@ int ch_master(int argc, char* argv[], int rank, int cpu_count) {
   }
 
   printf("Reading point cloud of size %d.\n", cloud_size);
-  point_t *point_cloud = init_point_cloud(cloud_size);
-  load_point_cloud(point_cloud, cloud_size, point_cloud_fp);
+  point_cloud_t point_cloud = load_point_cloud(cloud_size, point_cloud_fp);
   printf("[done]\n");
 
   bcast_point_cloud_size(&cloud_size);
 
-  chan_step_1(point_cloud, cloud_size, rank, cpu_count);
+  chan_step_1(point_cloud, rank, cpu_count);
 
   return 0;
 }
@@ -93,7 +92,7 @@ int ch_slave(int argc, char *argv[], int rank, int cpu_count) {
   bcast_point_cloud_size(&cloud_size);
   printf("[%d] Advertised point cloud size: %d\n", rank, cloud_size);
 
-  chan_step_1(NULL, cloud_size, rank, cpu_count);
+  chan_step_1(null_point_cloud(cloud_size), rank, cpu_count);
 
   return 0;
 }
@@ -116,18 +115,16 @@ void setup_scatter_params(int array_size, int dest_count, int *sizes, int *offse
 
 }
 
-void chan_step_1(point_t* pc, int pc_size, int rank, int cpu_count) {
+void chan_step_1(point_cloud_t pc, int rank, int cpu_count) {
   int chunk_sizes[MAX_CPUS], offsets[MAX_CPUS];
 
-  setup_scatter_params(pc_size, cpu_count, chunk_sizes, offsets);
-  point_t *pc_chunk = init_point_cloud(chunk_sizes[rank]);
+  setup_scatter_params(pc.size, cpu_count, chunk_sizes, offsets);
+  point_cloud_t pc_chunk = init_point_cloud(chunk_sizes[rank]);
 
-  MPI_Scatterv(pc, chunk_sizes, offsets, mpi_point_t, pc_chunk, chunk_sizes[rank], mpi_point_t, 0, MPI_COMM_WORLD);
+  MPI_Scatterv(pc.pc, chunk_sizes, offsets, mpi_point_t, pc_chunk.pc, pc_chunk.size, mpi_point_t, 0, MPI_COMM_WORLD);
 
-  point_t* chunk_hull = init_point_cloud(chunk_sizes[rank]);
-  ulong chunk_hull_size = 0;
-  qsort(pc_chunk, chunk_sizes[rank], sizeof(point_t), &point_compare);
-  convex_hull_monotone_chain(pc_chunk, chunk_sizes[rank], chunk_hull, &chunk_hull_size);
+  qsort(pc_chunk.pc, pc_chunk.size, sizeof(point_t), &point_compare);
+  convex_hull_monotone_chain(pc_chunk);
 }
 
 /*

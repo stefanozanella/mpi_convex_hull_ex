@@ -20,6 +20,14 @@ point_cloud_t init_point_cloud(ulong size) {
   return ret;
 }
 
+point_cloud_t null_point_cloud(ulong size) {
+  point_cloud_t ret;
+  ret.pc = NULL;
+  ret.size = size;
+
+  return ret;
+}
+
 int point_compare(const void *p_ptr1, const void *p_ptr2) {
   point_t p1 = *((point_t*)p_ptr1);
   point_t p2 = *((point_t*)p_ptr2);
