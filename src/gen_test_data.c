@@ -58,7 +58,9 @@ void init_round_limits(float *output, ulong rounds) {
   }
 }
 
-point_cloud_t generate_point_cloud(point_cloud_t pc) {
+point_cloud_t generate_point_cloud(int size) {
+  point_cloud_t pc = init_point_cloud(size);
+
   ulong rounds = pc.size / 1e2;
   float *round_limits = (float*) malloc(rounds * sizeof(float));
   init_round_limits(round_limits, rounds);
@@ -88,7 +90,7 @@ int main(int argc, char** argv) {
 
   double start_time = now();
   init_cloud_generation();
-  point_cloud_t point_cloud = generate_point_cloud(init_point_cloud(point_cloud_size));
+  point_cloud_t point_cloud = generate_point_cloud(point_cloud_size);
   double end_time = now();
 
   printf("Generated %lu points in %.6fs.\n", point_cloud_size, end_time - start_time);
@@ -107,8 +109,7 @@ int main(int argc, char** argv) {
   printf("Calculating the convex hull...\n");
   start_time = now();
   qsort(point_cloud.pc, point_cloud.size, sizeof(point_t), &point_compare);
-  point_cloud_t hull = init_point_cloud(point_cloud.size);
-  hull = convex_hull_monotone_chain(point_cloud, hull);
+  point_cloud_t hull = convex_hull_monotone_chain(point_cloud);
   end_time = now();
   printf("Found the convex hull in %.6fs.\n", end_time - start_time);
 

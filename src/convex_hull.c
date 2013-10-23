@@ -1,6 +1,7 @@
 #include "convex_hull.h"
 
-point_cloud_t convex_hull_monotone_chain(point_cloud_t cloud, point_cloud_t hull) {
+point_cloud_t convex_hull_monotone_chain(point_cloud_t cloud) {
+  point_cloud_t hull = init_point_cloud(cloud.size);
   int j = 0;
 
   for (int k = 0; k < cloud.size; k++) {
