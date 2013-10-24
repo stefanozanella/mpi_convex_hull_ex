@@ -89,7 +89,10 @@ int ch_master(int argc, char* argv[], int rank, int cpu_count) {
 
   point_cloud_t local_hull = chan_step_1(point_cloud, rank, cpu_count);
 
-  point_cloud_t final_hull = init_point_cloud(cloud_size);
+  // Here we need to account for the fact that the first point in the final
+  // hull is just a made up one. In the extreme case where all the point cloud
+  // is a convex hull, we'd have an overflow.
+  point_cloud_t final_hull = init_point_cloud(cloud_size + 1);
 
   final_hull.pc[0].x = 0;
   final_hull.pc[0].y = MIN_COORD;
