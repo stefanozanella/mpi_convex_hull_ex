@@ -84,6 +84,24 @@ int ch_master(int argc, char* argv[], int rank, int cpu_count) {
 
   point_cloud_t local_hull = chan_step_1(point_cloud, rank, cpu_count);
 
+  point_cloud_t final_hull = init_point_cloud(cloud_size);
+
+  final_hull.pc[0].x = 0;
+  final_hull.pc[0].y = MIN_COORD;
+
+  point_t local_min = local_hull.pc[0];
+
+  point_t rightmost;
+  printf("[%d] Min: (%ld, %ld)\n", rank, local_min.x, local_min.y);
+
+  MPI_Op mpi_point_min;
+  MPI_Op_create(mpi_point_min_op, 1, &mpi_point_min);
+  MPI_Reduce(&local_min, &rightmost, 1, mpi_point_t, mpi_point_min, 0, MPI_COMM_WORLD);
+
+//  for (int k = 0; k < local_hull.size; k++) {
+//    printf("x: %ld\n", local_hull.pc[k].x);
+//  }
+
   return 0;
 }
 
@@ -94,7 +112,34 @@ int ch_slave(int argc, char *argv[], int rank, int cpu_count) {
 
   point_cloud_t local_hull = chan_step_1(null_point_cloud(cloud_size), rank, cpu_count);
 
+  point_t local_min = local_hull.pc[0];
+
+  printf("[%d] Min: (%ld, %ld)\n", rank, local_min.x, local_min.y);
+
+  MPI_Op mpi_point_min;
+  MPI_Op_create(mpi_point_min_op, 1, &mpi_point_min);
+  MPI_Reduce(&local_min, NULL, 1, mpi_point_t, mpi_point_min, 0, MPI_COMM_WORLD);
+
   return 0;
+}
+
+void mpi_point_min_op(void *invec, void *inoutvec, int *len, MPI_Datatype *datatype) {
+  point_t* in = (point_t*)invec;
+  point_t* inout = (point_t*)inoutvec;
+
+  for (int k = 0; k < (*len); k++) {
+    printf("min_op in: %d -> (%ld, %ld)\n", k, in[k].x, in[k].y);
+  }
+
+  for (int k = 0; k < (*len); k++) {
+    printf("min_op out: %d -> (%ld, %ld)\n", k, inout[k].x, inout[k].y);
+  }
+
+  if (point_compare(&(in[0]), &(inout[0])) < 0) {
+    inout[0] = in[0];
+  }
+
+  printf("current min: (%ld, %ld)\n", inout[0].x, inout[0].y);
 }
 
 void bcast_point_cloud_size(int *size) {

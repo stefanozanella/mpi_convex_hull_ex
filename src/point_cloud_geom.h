@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
+
+#define MIN_COORD LONG_MIN;
 
 typedef unsigned long ulong;
 typedef signed long coord_t;

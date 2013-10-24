@@ -35,4 +35,5 @@ int ch_slave(int argc, char* argv[], int rank, int cpu_count);
 void bcast_point_cloud_size(int* size);
 void setup_scatter_params(int array_size, int dest_count, int *sizes, int *offsets);
 point_cloud_t chan_step_1(point_cloud_t pc, int rank, int cpu_count);
+void mpi_point_min_op(void *invec, void *inoutvec, int *len, MPI_Datatype *datatype);
 void print_usage(char *app_name);
